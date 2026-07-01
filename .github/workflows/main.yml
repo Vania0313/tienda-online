@@ -1,42 +1,39 @@
-name: Deploy a GitHub Pages
+name: Lint (ESLint + Stylelint)
 
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
+    branches:
+      - main
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Subir artefacto del sitio
-        uses: actions/upload-pages-artifact@v3
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
         with:
-          # Cambia esta ruta si tu index.html está en otra carpeta (ej. "./dist" o "./public")
-          path: "."
+          node-version: 24
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Desplegar en GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Instalar dependencias
+        run: |
+          npm install --no-save \
+          eslint \
+          @eslint/js \
+          stylelint \
+          stylelint-config-standard
+
+      - name: Ejecutar ESLint
+        run: |
+          npx eslint . --ext .js --no-error-on-unmatched-pattern
+
+      - name: Ejecutar Stylelint
+        run: |
+          npx stylelint "**/*.css" --allow-empty-input
