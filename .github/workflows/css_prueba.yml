@@ -9,21 +9,16 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout del repositorio
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
-      - name: Instalar ESLint y Stylelint
-        run: |
-          npm install --no-save eslint @eslint/js stylelint stylelint-config-standard
+      - run: npm install --no-save eslint @eslint/js stylelint stylelint-config-standard
 
-      - name: Ejecutar ESLint (JavaScript)
-        run: npx eslint "**/*.js" --ignore-pattern node_modules --no-error-on-unmatched-pattern
+      - run: npx eslint . --ext .js
 
-      - name: Ejecutar Stylelint (CSS)
-        run: npx stylelint "**/*.css" --ignore-path node_modules --allow-empty-input
+      - run: npx stylelint "**/*.css" --allow-empty-input
